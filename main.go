@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-var hadError bool = false
+var hadError = false
 
 
 func error(line int, message string) {
