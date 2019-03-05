@@ -10,10 +10,10 @@ learning compiler and Go
 - [function](#function)
 - [input](#input)
 - [output](#output)
-- [run go](#run_go)
-- [error handling](#error_handling)
-- [Q&A](#q&a)
-- [fucking stupid error i made QAQ](#fucking_stupid_error_i_made_QAQ)
+- [run go](#run-go)
+- [error handling](#error-handling)
+- [Q&A](#qa)
+- [fucking stupid error i made QAQ](#fucking-stupid-error-i-made-qaq)
 [compiler notes](#compiler)
 
 ## Go
