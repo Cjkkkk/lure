@@ -1,9 +1,12 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strconv"
+	lexer "awesomeProject/lexer"
 )
 
 var hadError = false
@@ -14,7 +17,7 @@ func error(line int, message string) {
 }
 
 func report(line int, where string, message string) {
-	fmt.Println("[line " + string(line) + "] Error" + where + ": " + message)
+	fmt.Println("[line " + strconv.Itoa(line) + "] Error" + where + ": " + message)
 	hadError = true
 }
 
@@ -22,7 +25,11 @@ func run(content string)  {
 	if hadError {
 		os.Exit(65)
 	}
-	var s scanner
+	s := lexer.Scanner{content, []lexer.Token{}, 0 ,0 , 1}
+	s.ScanTokens()
+	for _, t := range s.Tokens {
+		fmt.Println(t.Type)
+	}
 }
 func runFile(filename string) {
 	fmt.Println("running file...")
@@ -38,9 +45,10 @@ func runFile(filename string) {
 func runPromot()  {
 	for ;; {
 		fmt.Print("> ")
-		var input string
-		fmt.Scanln(&input)
-		run(input)
+		reader := bufio.NewReader(os.Stdin)
+		text, _ := reader.ReadString('\n')
+		//text = strings.Replace(text, "\n", "", -1)
+		run(text)
 		hadError = false
 	}
 }

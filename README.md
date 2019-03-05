@@ -57,6 +57,22 @@ const(
 	D
 	)
 ```
+
+
+#### interface
+```
+type geometry interface{
+    area() float64
+}
+
+type circle struct{
+    radius float64
+}
+
+func (c circle) area() float64{
+    return 3.14 * c.radius * c.radius
+}
+```
 ### variable initialization
 ```Go=
 // 1 init without init value
@@ -85,6 +101,12 @@ func hello(name string) string{
     return "hello " + name
 }
 ```
+
+#### overload
+does not exist
+
+#### optional parameter
+does not exist
 
 ### input
 #### read file
