@@ -12,7 +12,7 @@ type ParseError struct {
 	
 }
 
-func (p ParseError)Error() string{
+func (p ParseError) Error() string{
 	return "2333"
 }
 func Error(token lexer.Token, message string) {

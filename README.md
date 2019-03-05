@@ -13,11 +13,11 @@ learning compiler and Go
 - [run go](#run-go)
 - [error handling](#error-handling)
 - [Q&A](#qa)
-- [fucking stupid error i made QAQ](#fucking-stupid-error-i-made-qaq)
+- [fucking stupid things i wish i knew!)(#fucking-stupid-things-i-wish-i-knew)
 [compiler notes](#compiler)
 
 ## Go
-### types
+### Types
 - bool
 - numeric
     - uint8
@@ -82,7 +82,7 @@ func (c circle) area() float64{
     return 3.14 * c.radius * c.radius
 }
 ```
-### variable
+### Variable
 ```Go=
 // 1 init without init value
 var a int
@@ -104,7 +104,7 @@ for true {
 }
 ```
 
-### function
+### Function
 ```Go=
 func hello(name string) string{
     return "hello " + name
@@ -117,7 +117,7 @@ does not exist
 - #### optional parameter
 does not exist
 
-### input
+### Input
 - #### read file
 ```Go=
 str, err := ioutil.ReadFile(filename)
@@ -134,13 +134,13 @@ fmt.Scanln(&input)
 arg := os.Args
 ```
 
-### output
+### Output
 - #### console output
 ```Go=
 fmt.Println("hello world")
 ```
 
-### run go
+### Run go
 ```
 go build main.go
 go run main.go
@@ -149,13 +149,29 @@ go run main.go
 no exception
 - multiple returns
 - panic
+
+- #### Custom error
+```
+type MyError struct{
+
+}
+func (e *MyError) Error() string {
+    return "I am an error"
+}
+```
+- #### basic error
+```
+errors.New("can't work with 42")
+```
 ### Q&A
 - #### Java interface vs. Golang interface ?
 [参考链接](https://stackoverflow.com/questions/39932713/whats-the-differences-between-go-and-java-about-interface)
 
-### fucking stupid error i made QAQ
-- #### use pointer type when define method on struct!!! otherwise it will not change field
-```
+- #### how to handle error in Go?
+
+### Fucking stupid things i wish i knew!
+- #### Use pointer type when define method on struct!!! otherwise it will not change field
+```Go=
 type animal struct{
     age int
 }
@@ -173,7 +189,8 @@ fmt.Println(a.age) // 1
 a.aging_p()
 fmt.Println(a.age) // 2
 ```
-
+- #### Always use uppercase in package
+always use uppercase in package if you want to export that to other package
 
 ## compiler
 ### parse
