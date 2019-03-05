@@ -29,7 +29,7 @@ func (p *Parser)check(t lexer.TokenType ) bool{
 
 func (p *Parser) advance() lexer.Token{
 	if !p.isAtEnd() {
-		p.Current = p.Current + 1
+		p.Current += 1
 	}
 	return p.previous()
 }

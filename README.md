@@ -4,7 +4,16 @@ learning compiler and Go
 [参考链接](http://www.craftinginterpreters.com/contents.html)
 
 [Go notes](#go)
-
+- [types](#types)
+- [variable](#variable)
+- [control flow](#control_flow)
+- [function](#function)
+- [input](#input)
+- [output](#output)
+- [run go](#run_go)
+- [error handling](#error_handling)
+- [Q&A](#q&a)
+- [fucking stupid error i made QAQ](#fucking_stupid_error_i_made_QAQ)
 [compiler notes](#compiler)
 
 ## Go
@@ -73,7 +82,7 @@ func (c circle) area() float64{
     return 3.14 * c.radius * c.radius
 }
 ```
-### variable initialization
+### variable
 ```Go=
 // 1 init without init value
 var a int
@@ -143,6 +152,29 @@ no exception
 ### Q&A
 #### Java interface vs. Golang interface ?
 [参考链接](https://stackoverflow.com/questions/39932713/whats-the-differences-between-go-and-java-about-interface)
+
+### fucking stupid error i made QAQ
+#### use pointer type when define method on struct!!! otherwise it will not change field
+```
+type animal struct{
+    age int
+}
+func (a animal) aging() {
+    a.age ++
+}
+
+func (a *animal) aging_p() {
+    a.age ++
+}
+
+var a = animal{age: 1}
+a.aging()
+fmt.Println(a.age) // 1
+a.aging_p()
+fmt.Println(a.age) // 2
+```
+
+
 ## compiler
 ### parse
 #### solve ambiguous
