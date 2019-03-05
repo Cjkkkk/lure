@@ -150,11 +150,11 @@ no exception
 - multiple returns
 - panic
 ### Q&A
-#### Java interface vs. Golang interface ?
+- #### Java interface vs. Golang interface ?
 [参考链接](https://stackoverflow.com/questions/39932713/whats-the-differences-between-go-and-java-about-interface)
 
 ### fucking stupid error i made QAQ
-#### use pointer type when define method on struct!!! otherwise it will not change field
+- #### use pointer type when define method on struct!!! otherwise it will not change field
 ```
 type animal struct{
     age int
