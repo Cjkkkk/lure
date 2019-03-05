@@ -285,14 +285,14 @@ type Unary struct{
 */
 type AstPrinter struct{}
 
-func (a AstPrinter) Print(expr Expr) string{
+func (a *AstPrinter) Print(expr Expr) string{
 	return expr.accept(a)
 }
 
-func (a AstPrinter) BinaryAccept(expr Binary) string{
+func (a *AstPrinter) BinaryAccept(expr Binary) string{
 	return a.parenthesize(expr.Operator.Lexeme, expr.Left, expr.Right)
 }
-func (a AstPrinter)LiteralAccept(expr Literal) string{
+func (a *AstPrinter)LiteralAccept(expr Literal) string{
 	if expr.Value == nil {
 		return "nil"
 	}
@@ -306,14 +306,14 @@ func (a AstPrinter)LiteralAccept(expr Literal) string{
 		return "???"
 	}
 }
-func (a AstPrinter)GroupingAccept(expr Grouping) string{
+func (a *AstPrinter) GroupingAccept(expr Grouping) string{
 	return a.parenthesize("group", expr.Expression)
 }
-func (a AstPrinter)UnaryAccept(expr Unary) string{
+func (a *AstPrinter) UnaryAccept(expr Unary) string{
 	return a.parenthesize(expr.Operator.Lexeme, expr.Right)
 }
 
-func (a AstPrinter)parenthesize(name string, exprs ...Expr) string {
+func (a *AstPrinter) parenthesize(name string, exprs ...Expr) string {
 	var builder = ""
 	builder = builder + "(" + name
 	for _, expr:= range exprs {

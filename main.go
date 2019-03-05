@@ -5,31 +5,28 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"strconv"
+	error "awesomeProject/error"
 	lexer "awesomeProject/lexer"
+	parser "awesomeProject/parser"
 )
 
-var hadError = false
-
-
-func error(line int, message string) {
-	report(line, "", message)
-}
-
-func report(line int, where string, message string) {
-	fmt.Println("[line " + strconv.Itoa(line) + "] Error" + where + ": " + message)
-	hadError = true
-}
 
 func run(content string)  {
-	if hadError {
+	if error.HadError {
 		os.Exit(65)
 	}
 	s := lexer.Scanner{content, []lexer.Token{}, 0 ,0 , 1}
 	s.ScanTokens()
-	for _, t := range s.Tokens {
-		fmt.Println(t.Type)
+	p := parser.Parser{s.Tokens , 0}
+	expression := p.Parse()
+	if error.HadError {
+		return
 	}
+	a := lexer.AstPrinter{}
+	fmt.Println(a.Print(expression))
+	//for _, t := range s.Tokens {
+	//	fmt.Println(t.Type)
+	//}
 }
 func runFile(filename string) {
 	fmt.Println("running file...")
@@ -49,23 +46,23 @@ func runPromot()  {
 		text, _ := reader.ReadString('\n')
 		//text = strings.Replace(text, "\n", "", -1)
 		run(text)
-		hadError = false
+		error.HadError = false
 	}
 }
 func main(){
-	args := os.Args
-	 var expression = lexer.Binary{
-		 lexer.Unary{
-			 lexer.Token{lexer.MINUS, "-", nil, 1},
-			 lexer.Literal{123},
-	 		},
-		lexer.Token{lexer.STAR, "*", nil, 1},
-		 lexer.Grouping{
-		lexer.Literal{45.67},
-	 	},
-	 }
+	 args := os.Args
+	 //var expression = lexer.Binary{
+		// lexer.Unary{
+		//	 lexer.Token{lexer.MINUS, "-", nil, 1},
+		//	 lexer.Literal{123},
+	 //		},
+		//lexer.Token{lexer.STAR, "*", nil, 1},
+		// lexer.Grouping{
+		//lexer.Literal{45.67},
+	 //	},
+	 //}
 
-	fmt.Println( lexer.AstPrinter{}.Print(expression))
+	//fmt.Println( lexer.AstPrinter{}.Print(expression))
 	if len(args) > 2 {
 		fmt.Println("Usage: lox [script]")
 	}else if len(args) == 2 {

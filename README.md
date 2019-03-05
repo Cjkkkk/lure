@@ -136,6 +136,19 @@ fmt.Println("hello world")
 go build main.go
 go run main.go
 ```
-
-
+### error handling
+no exception
+- multiple returns
+- panic
+### Q&A
+#### Java interface vs. Golang interface ?
+[参考链接](https://stackoverflow.com/questions/39932713/whats-the-differences-between-go-and-java-about-interface)
 ## compiler
+### parse
+#### solve ambiguous
+precedence and associativity
+
+#### tech
+- recursive decent top-down
+terminal match 上了就不会再回退了 之前还以可能还会回退 就有可能需要把token再吐出来23333
+- LR bottom-up
