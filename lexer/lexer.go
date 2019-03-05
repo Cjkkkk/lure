@@ -1,6 +1,9 @@
 package lexer
 
-import "strconv"
+import (
+	"fmt"
+	"strconv"
+)
 
 type TokenType int
 
@@ -54,17 +57,34 @@ const(
 	EOF
 )
 
-//m := make(map[string]TokenType)
+var KeyWords = map[string]TokenType {
+	"and":    AND,
+	"class":  CLASS,
+	"else":   ELSE,
+	"false":  FALSE,
+	"for":    FOR,
+	"fun":    FUN,
+	"if":     IF,
+	"nil":    NIL,
+	"or":     OR,
+	"print":  PRINT,
+	"return": RETURN,
+	"super":  SUPER,
+	"this":   THIS,
+	"true":   TRUE,
+	"var":    VAR,
+	"while":  WHILE,
+}
 
 type Token struct {
 	Type TokenType
-	lexeme string
-	literal interface {}
+	Lexeme string
+	Literal interface {}
 	Line int
 }
 
 func (t *Token) toString() string{
-	return string(t.Type) + " " + t.lexeme
+	return string(t.Type) + " " + t.Lexeme
 }
 
 type Scanner struct {
@@ -95,8 +115,8 @@ func (s *Scanner) string() {
 		//error(s.Line, "Unterminated string.")
 	}
 	s.advance()
-	value := s.Source[s.Start + 1:s.Current - 1]
-	s.addToken(STRING, value)
+	Value := s.Source[s.Start + 1:s.Current - 1]
+	s.addToken(STRING, Value)
 }
 func (s *Scanner) peek() byte{
 	if s.isAtEnd() {
@@ -180,7 +200,10 @@ func (s *Scanner)identifier(){
 	for isAlphaNumeric(s.peek()){
 		s.advance()
 	}
-	s.addToken(IDENTIFIER, nil)
+	var text = s.Source[s.Start: s.Current]
+	var t, OK = KeyWords[text]
+	if !OK { t = IDENTIFIER }
+	s.addToken(t, nil)
 }
 func (s *Scanner)number() {
 	for isDigit(s.peek()){
@@ -201,7 +224,7 @@ func (s *Scanner)number() {
 
 func (s *Scanner)ScanTokens() []Token {
 	for !s.isAtEnd() {
-		// We are at the beginning of the next lexeme.
+		// We are at the beginning of the next Lexeme.
 		s.Start = s.Current
 		s.scanToken()
 	}
@@ -210,3 +233,93 @@ func (s *Scanner)ScanTokens() []Token {
 	return s.Tokens
 }
 
+/*
+	visitor 接口
+*/
+type Visitor interface {
+	BinaryAccept(expr Binary) string
+	UnaryAccept(expr Unary) string
+	GroupingAccept(expr Grouping) string
+	LiteralAccept(expr Literal) string
+}
+
+/*
+	Expr
+*/
+type Expr interface {
+	accept(a Visitor) string
+}
+
+func (b Binary) accept(a Visitor) string{
+	return a.BinaryAccept(b)
+}
+func (g Grouping) accept(a Visitor) string{
+	return a.GroupingAccept(g)
+}
+func (l Literal) accept(a Visitor) string{
+	return a.LiteralAccept(l)
+}
+func (u Unary) accept(a Visitor) string{
+	return a.UnaryAccept(u)
+}
+type Binary struct {
+	Left Expr
+	Operator Token
+	Right Expr
+}
+
+type Grouping struct {
+	Expression Expr
+}
+
+type Literal struct {
+	Value interface{}
+}
+type Unary struct{
+	Operator Token
+	Right Expr
+}
+
+/*
+	AstPrinter struct 实现 Visitor接口
+*/
+type AstPrinter struct{}
+
+func (a AstPrinter) Print(expr Expr) string{
+	return expr.accept(a)
+}
+
+func (a AstPrinter) BinaryAccept(expr Binary) string{
+	return a.parenthesize(expr.Operator.Lexeme, expr.Left, expr.Right)
+}
+func (a AstPrinter)LiteralAccept(expr Literal) string{
+	if expr.Value == nil {
+		return "nil"
+	}
+	if str, ok := expr.Value.(string); ok {
+		return str
+	} else if number, ok := expr.Value.(float64); ok{
+		return fmt.Sprintf("%f", number)
+	} else if number, ok := expr.Value.(int); ok {
+		return fmt.Sprintf("%d", number)
+	} else {
+		return "???"
+	}
+}
+func (a AstPrinter)GroupingAccept(expr Grouping) string{
+	return a.parenthesize("group", expr.Expression)
+}
+func (a AstPrinter)UnaryAccept(expr Unary) string{
+	return a.parenthesize(expr.Operator.Lexeme, expr.Right)
+}
+
+func (a AstPrinter)parenthesize(name string, exprs ...Expr) string {
+	var builder = ""
+	builder = builder + "(" + name
+	for _, expr:= range exprs {
+		builder += " "
+		builder += expr.accept(a)
+	}
+	builder += ")"
+	return builder
+}

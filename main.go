@@ -54,6 +54,18 @@ func runPromot()  {
 }
 func main(){
 	args := os.Args
+	 var expression = lexer.Binary{
+		 lexer.Unary{
+			 lexer.Token{lexer.MINUS, "-", nil, 1},
+			 lexer.Literal{123},
+	 		},
+		lexer.Token{lexer.STAR, "*", nil, 1},
+		 lexer.Grouping{
+		lexer.Literal{45.67},
+	 	},
+	 }
+
+	fmt.Println( lexer.AstPrinter{}.Print(expression))
 	if len(args) > 2 {
 		fmt.Println("Usage: lox [script]")
 	}else if len(args) == 2 {
