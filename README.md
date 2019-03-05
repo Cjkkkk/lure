@@ -44,7 +44,7 @@ learning compiler and Go
     - Map types
     - Channel Types
 
-#### struct
+- #### struct
 ```Go=
 type Book struct{
     name string
@@ -57,7 +57,7 @@ func (b *Book) getName() string{
 
 ```
 
-#### enum
+- #### enum
 ```Go=
 const(
 	A int = iota
@@ -68,7 +68,7 @@ const(
 ```
 
 
-#### interface
+- #### interface
 ```
 type geometry interface{
     area() float64
@@ -92,8 +92,8 @@ var a = 1
 a := 1
 ```
 ### control flow
-#### while does not exist
-#### for
+- #### while does not exist
+- #### for
 ```Go=
 for ; ; {
 
@@ -111,31 +111,31 @@ func hello(name string) string{
 }
 ```
 
-#### overload
+- #### overload
 does not exist
 
-#### optional parameter
+- #### optional parameter
 does not exist
 
 ### input
-#### read file
+- #### read file
 ```Go=
 str, err := ioutil.ReadFile(filename)
 ```
 
-#### read stdin
+- #### read stdin
 ```Go=
 var input string
 fmt.Scanln(&input)
 ```
 
-#### read command line arguments
+- #### read command line arguments
 ```Go=
 arg := os.Args
 ```
 
 ### output
-#### console output
+- #### console output
 ```Go=
 fmt.Println("hello world")
 ```
