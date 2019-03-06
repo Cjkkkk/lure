@@ -6,14 +6,15 @@ learning compiler and Go
 [Go notes](#go)
 - [types](#types)
 - [variable](#variable)
-- [control flow](#control_flow)
+- [control flow](#control-flow)
 - [function](#function)
 - [input](#input)
 - [output](#output)
 - [run go](#run-go)
 - [error handling](#error-handling)
 - [Q&A](#qa)
-- [fucking stupid things i wish i knew!)(#fucking-stupid-things-i-wish-i-knew)
+- [fucking stupid things i wish i knew!](#fucking-stupid-things-i-wish-i-knew)
+
 [compiler notes](#compiler)
 
 ## Go

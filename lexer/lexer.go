@@ -323,3 +323,79 @@ func (a *AstPrinter) parenthesize(name string, exprs ...Expr) string {
 	builder += ")"
 	return builder
 }
+
+/*
+Interpreter
+*/
+
+type Interpreter struct {
+	AstPrinter
+}
+
+func (i *Interpreter) visitLiteralExpr(expr Literal) interface{}{
+	return expr.Value
+}
+
+func (i *Interpreter) visitGroupingExpr(expr Grouping) interface{}{
+	return i.evaluate(expr.Expression)
+}
+
+func (i *Interpreter) evaluate(expr Expr) interface{}{
+	return expr.accept(i)
+}
+func (i *Interpreter) isTruthy(object interface{}) bool{
+	if object == nil {
+		return false
+	}
+	if r, ok := object.(bool); ok {
+		return r
+	}
+	return true
+}
+// todo
+func (i *Interpreter) visitBinaryExpr(expr Binary) interface{}{
+	left := i.evaluate(expr.Left)
+	right := i.evaluate(expr.Right)
+	r_d, r_ok := right.(string)
+	l_d, l_ok := left.(string)
+	if !l_ok || !r_ok{
+		return nil
+	}
+	r, _ := strconv.ParseFloat(r_d, 64)
+	l, _ := strconv.ParseFloat(l_d, 64)
+	switch expr.Operator.Type {
+		case MINUS:
+			return l - r
+	//case PLUS:
+	//	if (left instanceof Double && right instanceof Double) {
+	//	return (double)left + (double)right;
+	//}
+	//
+	//	if (left instanceof String && right instanceof String) {
+	//	return (String)left + (String)right;
+	//}
+	case SLASH:
+			return l / r
+		case STAR:
+			return l * r
+	}
+
+	// Unreachable.
+	return nil
+}
+func (i *Interpreter) visitUnaryExpr (expr Unary) interface{} {
+	right := i.evaluate(expr.Right)
+	switch expr.Operator.Type {
+	case BANG:
+		return !i.isTruthy(right)
+	case MINUS:
+			d, ok := right.(string)
+			if ok {
+				r, _ := strconv.ParseFloat(d, 64)
+				return - r
+			}
+	}
+
+	// Unreachable.
+	return nil
+}
