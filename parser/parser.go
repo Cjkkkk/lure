@@ -56,7 +56,7 @@ func (p *Parser)equality() lexer.Expr {
 	for p.match(lexer.BANG_EQUAL, lexer.EQUAL_EQUAL) {
 		operator := p.previous()
 		right := p.comparison()
-		expr = lexer.Binary{expr, operator, right}
+		expr = lexer.Binary{Left:expr, Operator:operator, Right:right}
 	}
 	return expr
 }
@@ -83,7 +83,7 @@ func (p *Parser) addition() lexer.Expr{
 	for p.match(lexer.MINUS, lexer.PLUS) {
 		operator := p.previous()
 		right := p.multiplication()
-		expr = lexer.Binary{expr, operator, right}
+		expr = lexer.Binary{Left:expr, Operator:operator,Right: right}
 	}
 	return expr
 }
@@ -94,7 +94,7 @@ func (p *Parser) multiplication() lexer.Expr{
 	for p.match(lexer.SLASH, lexer.STAR) {
 		operator := p.previous()
 		right := p.unary()
-		expr = lexer.Binary{expr, operator, right}
+		expr = lexer.Binary{Left:expr, Operator:operator, Right:right}
 	}
 	return expr
 }
@@ -104,7 +104,7 @@ func (p *Parser) unary() lexer.Expr{
 	if p.match(lexer.BANG, lexer.MINUS) {
 		operator := p.previous()
 		right := p.unary()
-		return lexer.Unary{operator, right}
+		return lexer.Unary{Operator:operator, Right:right}
 	}
 	if r, e := p.primary(); e != nil {
 		// todo
@@ -116,21 +116,21 @@ func (p *Parser) unary() lexer.Expr{
 
 func (p *Parser) primary() (lexer.Expr, error){
 	if p.match(lexer.FALSE){
-		return lexer.Literal{false}, nil
+		return lexer.Literal{Value:false}, nil
 	}
 	if p.match(lexer.TRUE) {
-		return lexer.Literal{true}, nil
+		return lexer.Literal{Value:true}, nil
 	}
 	if p.match(lexer.NIL) {
-		return lexer.Literal{nil}, nil
+		return lexer.Literal{Value:nil}, nil
 	}
 	if p.match(lexer.NUMBER, lexer.STRING) {
-		return lexer.Literal{p.previous().Literal}, nil
+		return lexer.Literal{Value:p.previous().Literal}, nil
 	}
 	if p.match(lexer.LEFT_PAREN) {
 		expr := p.expression()
 		p.consume(lexer.RIGHT_PAREN, "Expect ')' after expression.")
-		return lexer.Grouping{expr}, nil
+		return lexer.Grouping{Expression:expr}, nil
 	}
 	return nil, p.error(p.peek(), "Expect expression.")
 }
@@ -168,8 +168,30 @@ func (p *Parser) synchronize() {
 	p.advance()
 	}
 }
+func (p *Parser) statement() lexer.Stmt{
+	if p.match(lexer.PRINT) {
+		return p.printStatement()
+	}
+	return p.expressionStatement()
+}
 
-func (p *Parser) Parse() lexer.Expr {
-	return p.expression()
+func (p *Parser) printStatement() lexer.Stmt{
+	value := p.expression()
+	p.consume(lexer.SEMICOLON, "Expect ';' after value.")
+	return lexer.Print{Expression: value}
+}
+
+func (p *Parser) expressionStatement() lexer.Stmt{
+	expr := p.expression()
+	p.consume(lexer.SEMICOLON, "Expect ';' after expression.")
+	return lexer.Expression{Expression: expr}
+}
+func (p *Parser) Parse() []lexer.Stmt {
+	var statements []lexer.Stmt
+	for !p.isAtEnd() {
+		statements = append(statements, p.statement())
+	}
+	return statements
+	//return p.expression()
 	// todo error handling
 }

@@ -293,6 +293,18 @@ type Unary struct{
 	Right Expr
 }
 
+type Stmt interface {
+
+}
+
+type Expression struct {
+	Expression Expr
+}
+type Print struct {
+	Expression Expr
+}
+
+
 /*
 	AstPrinter struct 实现 Visitor接口
 */
@@ -380,17 +392,15 @@ func (i *Interpreter) visitGroupingExpr(expr Grouping) interface{}{
 func (i *Interpreter) visitBinaryExpr(expr Binary) interface{}{
 	left := expr.Left.eval(i)
 	right := expr.Right.eval(i)
-	r_d, r_ok := right.(float64)
-	l_d, l_ok := left.(float64)
 	//r, r_o := strconv.ParseFloat(r_d, 64)
 	//l, l_o := strconv.ParseFloat(l_d, 64)
 	switch expr.Operator.Type {
 		case MINUS:
-			if r_ok && l_ok {
-				return l_d - r_d
-			}
-			return nil
+			l_d , r_d := checkNumberOperands(expr.Operator, left, right)
+			return l_d - r_d
 		case PLUS:
+			r_d, r_ok := right.(string)
+			l_d, l_ok := left.(string)
 			if r_ok && l_ok {
 				return l_d + r_d
 			}
@@ -399,19 +409,27 @@ func (i *Interpreter) visitBinaryExpr(expr Binary) interface{}{
 			if r_ok && l_ok {
 				return l_s + r_s
 			}
-			return nil
+			//err := error.RunTimeError{ Token: operator , Msg: "Operands must be two numbers or two strings."}
 		case SLASH:
-			if r_ok && l_ok {
-				return l_d / r_d
-			}
-			return nil
+			l_d , r_d := checkNumberOperands(expr.Operator, left, right)
+			return l_d / r_d
 		case STAR:
-			if r_ok && l_ok {
-				return l_d * r_d
-			}
-			return nil
+			l_d , r_d := checkNumberOperands(expr.Operator, left, right)
+			return l_d * r_d
 		case BANG_EQUAL: return !i.isEqual(left, right)
 		case EQUAL_EQUAL: return i.isEqual(left, right)
+		case GREATER:
+			l_d , r_d := checkNumberOperands(expr.Operator, left, right)
+			return l_d >= r_d
+		case GREATER_EQUAL:
+			l_d , r_d := checkNumberOperands(expr.Operator, left, right)
+			return l_d >= r_d
+		case LESS:
+			l_d , r_d := checkNumberOperands(expr.Operator, left, right)
+			return l_d < r_d
+		case LESS_EQUAL:
+			l_d , r_d := checkNumberOperands(expr.Operator, left, right)
+			return l_d <= r_d
 		}
 	// Unreachable.
 	return nil
@@ -422,12 +440,25 @@ func (i *Interpreter) visitUnaryExpr (expr Unary) interface{} {
 	case BANG:
 		return !i.isTruthy(right)
 	case MINUS:
-			d, ok := right.(string)
-			if ok {
-				r, _ := strconv.ParseFloat(d, 64)
-				return - r
-			}
+		return - checkNumberOperand(expr.Operator, right)
 	}
 	// Unreachable.
 	return nil
+}
+
+func checkNumberOperand(operator Token, operand interface{}) float64{
+	d, ok := operand.(float64)
+	if ! ok {
+		//err := error.RunTimeError{ Token: operator , Msg: "Operand must be a number."}
+	}
+	return d
+}
+
+func checkNumberOperands(operator Token, left interface{}, right interface{}) (float64, float64){
+	ld, l_ok := left.(float64)
+	rd, r_ok := right.(float64)
+	if !l_ok || !r_ok {
+
+	}
+	return ld, rd
 }

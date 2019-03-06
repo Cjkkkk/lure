@@ -15,13 +15,13 @@ func run(content string)  {
 	if error.HadError {
 		os.Exit(65)
 	}
+	if error.HadRuntimeError{
+		os.Exit(70)
+	}
 	s := lexer.Scanner{content, []lexer.Token{}, 0 ,0 , 1}
 	s.ScanTokens()
 	p := parser.Parser{s.Tokens , 0}
 	expression := p.Parse()
-	if error.HadError {
-		return
-	}
 	a := lexer.AstPrinter{}
 	b := lexer.Interpreter{}
 	fmt.Println(a.Print(expression))

@@ -196,9 +196,13 @@ always use uppercase in package if you want to export that to other package
 ## compiler
 ### parse
 #### solve ambiguous
-precedence and associativity
-
+- precedence and associativity
+- add more non-terminal to introduce precedence  
 #### tech
 - recursive decent top-down
 terminal match 上了就不会再回退了 之前还以可能还会回退 就有可能需要把token再吐出来23333
 - LR bottom-up
+
+#### runtime error
+- when convert tokens into AST, we throw static error
+- when walking AST, we throw runtime error

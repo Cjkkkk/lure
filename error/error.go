@@ -7,12 +7,20 @@ import (
 )
 
 var HadError = false
-
+var HadRuntimeError = false
 type ParseError struct {
 	
 }
 
-func (p ParseError) Error() string{
+type RunTimeError struct {
+	Msg string
+	Token lexer.Token
+}
+func (r *RunTimeError) Error() string{
+	HadRuntimeError = true
+	return r.Msg + "\n[line " + strconv.Itoa(r.Token.Line) + "]"
+}
+func (p *ParseError) Error() string{
 	return "2333"
 }
 func Error(token lexer.Token, message string) {
