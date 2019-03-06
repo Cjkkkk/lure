@@ -23,7 +23,9 @@ func run(content string)  {
 		return
 	}
 	a := lexer.AstPrinter{}
+	b := lexer.Interpreter{}
 	fmt.Println(a.Print(expression))
+	fmt.Println(b.Evaluate(expression))
 	//for _, t := range s.Tokens {
 	//	fmt.Println(t.Type)
 	//}

@@ -236,30 +236,43 @@ func (s *Scanner)ScanTokens() []Token {
 /*
 	visitor 接口
 */
-type Visitor interface {
-	BinaryAccept(expr Binary) string
-	UnaryAccept(expr Unary) string
-	GroupingAccept(expr Grouping) string
-	LiteralAccept(expr Literal) string
-}
+//type Visitor interface {
+//	BinaryAccept(expr Binary) string
+//	UnaryAccept(expr Unary) string
+//	GroupingAccept(expr Grouping) string
+//	LiteralAccept(expr Literal) string
+//}
 
 /*
 	Expr
 */
 type Expr interface {
-	accept(a Visitor) string
+	accept(a *AstPrinter) string
+	eval(a *Interpreter) interface{}
+}
+func (b Binary) eval(a *Interpreter) interface{}{
+	return a.visitBinaryExpr(b)
+}
+func (g Grouping) eval(a *Interpreter) interface{}{
+	return a.visitGroupingExpr(g)
+}
+func (l Literal) eval(a *Interpreter) interface{}{
+	return a.visitLiteralExpr(l)
+}
+func (u Unary) eval(a *Interpreter) interface{}{
+	return a.visitUnaryExpr(u)
 }
 
-func (b Binary) accept(a Visitor) string{
+func (b Binary) accept(a *AstPrinter) string{
 	return a.BinaryAccept(b)
 }
-func (g Grouping) accept(a Visitor) string{
+func (g Grouping) accept(a *AstPrinter) string{
 	return a.GroupingAccept(g)
 }
-func (l Literal) accept(a Visitor) string{
+func (l Literal) accept(a *AstPrinter) string{
 	return a.LiteralAccept(l)
 }
-func (u Unary) accept(a Visitor) string{
+func (u Unary) accept(a *AstPrinter) string{
 	return a.UnaryAccept(u)
 }
 type Binary struct {
@@ -328,21 +341,12 @@ func (a *AstPrinter) parenthesize(name string, exprs ...Expr) string {
 Interpreter
 */
 
-type Interpreter struct {
-	AstPrinter
+type Interpreter struct {}
+
+func (i *Interpreter) Evaluate(expr Expr) interface{}{
+	return expr.eval(i)
 }
 
-func (i *Interpreter) visitLiteralExpr(expr Literal) interface{}{
-	return expr.Value
-}
-
-func (i *Interpreter) visitGroupingExpr(expr Grouping) interface{}{
-	return i.evaluate(expr.Expression)
-}
-
-func (i *Interpreter) evaluate(expr Expr) interface{}{
-	return expr.accept(i)
-}
 func (i *Interpreter) isTruthy(object interface{}) bool{
 	if object == nil {
 		return false
@@ -352,39 +356,68 @@ func (i *Interpreter) isTruthy(object interface{}) bool{
 	}
 	return true
 }
+
+func (i *Interpreter) isEqual(a interface{}, b interface{}) bool {
+	// nil is only equal to nil.
+	if a == nil && b == nil {
+		return true
+	}
+	if a == nil{
+		return false
+	}
+	return a == b
+}
+
+func (i *Interpreter) visitLiteralExpr(expr Literal) interface{}{
+	return expr.Value
+}
+
+func (i *Interpreter) visitGroupingExpr(expr Grouping) interface{}{
+	return expr.Expression.eval(i)
+}
+
 // todo
 func (i *Interpreter) visitBinaryExpr(expr Binary) interface{}{
-	left := i.evaluate(expr.Left)
-	right := i.evaluate(expr.Right)
-	r_d, r_ok := right.(string)
-	l_d, l_ok := left.(string)
-	if !l_ok || !r_ok{
-		return nil
-	}
-	r, _ := strconv.ParseFloat(r_d, 64)
-	l, _ := strconv.ParseFloat(l_d, 64)
+	left := expr.Left.eval(i)
+	right := expr.Right.eval(i)
+	r_d, r_ok := right.(float64)
+	l_d, l_ok := left.(float64)
+	//r, r_o := strconv.ParseFloat(r_d, 64)
+	//l, l_o := strconv.ParseFloat(l_d, 64)
 	switch expr.Operator.Type {
 		case MINUS:
-			return l - r
-	//case PLUS:
-	//	if (left instanceof Double && right instanceof Double) {
-	//	return (double)left + (double)right;
-	//}
-	//
-	//	if (left instanceof String && right instanceof String) {
-	//	return (String)left + (String)right;
-	//}
-	case SLASH:
-			return l / r
+			if r_ok && l_ok {
+				return l_d - r_d
+			}
+			return nil
+		case PLUS:
+			if r_ok && l_ok {
+				return l_d + r_d
+			}
+			r_s, r_ok := right.(string)
+			l_s, l_ok := left.(string)
+			if r_ok && l_ok {
+				return l_s + r_s
+			}
+			return nil
+		case SLASH:
+			if r_ok && l_ok {
+				return l_d / r_d
+			}
+			return nil
 		case STAR:
-			return l * r
-	}
-
+			if r_ok && l_ok {
+				return l_d * r_d
+			}
+			return nil
+		case BANG_EQUAL: return !i.isEqual(left, right)
+		case EQUAL_EQUAL: return i.isEqual(left, right)
+		}
 	// Unreachable.
 	return nil
 }
 func (i *Interpreter) visitUnaryExpr (expr Unary) interface{} {
-	right := i.evaluate(expr.Right)
+	right := expr.Right.eval(i)
 	switch expr.Operator.Type {
 	case BANG:
 		return !i.isTruthy(right)
@@ -395,7 +428,6 @@ func (i *Interpreter) visitUnaryExpr (expr Unary) interface{} {
 				return - r
 			}
 	}
-
 	// Unreachable.
 	return nil
 }
