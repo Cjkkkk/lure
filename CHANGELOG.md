@@ -7,9 +7,14 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 ### Added
 - tons of shit
 
+## 0.2.0 - 2019-03-07
+### Added
+- parser to evaluate AST statements
+- add variable
+
 ## 0.1.0 - 2019-03-07
 ### Added
-- parser to evaluate AST
+- parser to evaluate AST expressions
 
 ## 0.0.2 - 2019-03-06
 ### Added
