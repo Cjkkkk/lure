@@ -21,14 +21,10 @@ func run(content string)  {
 	s := lexer.Scanner{content, []lexer.Token{}, 0 ,0 , 1}
 	s.ScanTokens()
 	p := parser.Parser{s.Tokens , 0}
-	expression := p.Parse()
-	a := lexer.AstPrinter{}
-	b := lexer.Interpreter{}
-	fmt.Println(a.Print(expression))
-	fmt.Println(b.Evaluate(expression))
-	//for _, t := range s.Tokens {
-	//	fmt.Println(t.Type)
-	//}
+	stmts := p.Parse()
+	//a := interpreter.AstPrinter{}
+	b := parser.MakeInterpreter()
+	b.Interpret_(stmts)
 }
 func runFile(filename string) {
 	fmt.Println("running file...")

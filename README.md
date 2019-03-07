@@ -206,3 +206,11 @@ terminal match 上了就不会再回退了 之前还以可能还会回退 就有
 #### runtime error
 - when convert tokens into AST, we throw static error
 - when walking AST, we throw runtime error
+
+
+#### three-address code
+It is possible that a compiler will construct a syntax tree at the same time
+it emits steps of three-address code. However, it is common for compilers to
+emit the three-address code while the parser "goes through the motions" of
+constructing a syntax tree, without actually constructing the complete tree
+data structure
