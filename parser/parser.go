@@ -204,10 +204,37 @@ func (p *Parser) statement() Stmt{
 	if p.match(lexer.PRINT) {
 		return p.printStatement()
 	}
+	if p.match(lexer.IF) {
+		return p.ifStatement()
+	}
+	if p.match(lexer.WHILE) {
+		return p.whileStatement()
+	}
 	if p.match(lexer.LEFT_BRACE){
 		return Block{Statements: p.block()}
 	}
 	return p.expressionStatement()
+}
+
+func (p *Parser) whileStatement() Stmt{
+	p.consume(lexer.LEFT_PAREN, "Expect '(' after 'while.")
+	condition := p.expression()
+	p.consume(lexer.RIGHT_PAREN, "Expect ')' after 'while condition.")
+
+	Branch := p.statement()
+	return WhileStatement{Condition:condition, Branch: Branch}
+}
+func (p *Parser) ifStatement() Stmt{
+	p.consume(lexer.LEFT_PAREN, "Expect '(' after 'if.")
+	condition := p.expression()
+	p.consume(lexer.RIGHT_PAREN, "Expect ')' after 'if condition.")
+
+	thenBranch := p.statement()
+	var elseBranch Stmt = nil
+	if p.match(lexer.ELSE) {
+		elseBranch = p.statement()
+	}
+	return IfStatement{Condition:condition, ThenBranch: thenBranch, ElseBranch:elseBranch}
 }
 
 func (p *Parser) printStatement() Stmt{

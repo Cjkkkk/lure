@@ -1,9 +1,20 @@
 var a = 1;
 var b = 2;
-var c = 3;
 b = 3;
 {
     var b = 2;
     b = 5;
 }
-print a + b + c;
+if (b > 10) {
+    a = 2;
+}
+else {
+    a = 4;
+}
+
+while ( a > 0 ) {
+    print a;
+    a = a - 1;
+}
+print a + b;
+print "hello world";

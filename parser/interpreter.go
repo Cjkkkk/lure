@@ -35,6 +35,19 @@ func (i *Interpreter) Execute (stmt Stmt) {
 	stmt.Eval(i)
 }
 
+func (i *Interpreter) VisitWhileStmt(stmt WhileStatement) {
+	for i.isTruthy(i.Evaluate(stmt.Condition)) {
+		i.Execute(stmt.Branch)
+	}
+}
+
+func (i *Interpreter) VisitIfStmt(stmt IfStatement) {
+	if i.isTruthy(stmt.Condition.Eval(i)) {
+		stmt.ThenBranch.Eval(i)
+	} else{
+		stmt.ElseBranch.Eval(i)
+	}
+}
 func (i *Interpreter) VisitPrintStmt(stmt Print) {
 	value := i.Evaluate(stmt.Expression)
 	fmt.Println(value)

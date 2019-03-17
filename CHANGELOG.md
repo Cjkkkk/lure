@@ -9,8 +9,9 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 
 ## 0.3.0 - 2019-03-17
 ### Added
-- add scope for global and local variable
-
+- add scope
+- add if
+- add while
 ## 0.2.0 - 2019-03-07
 ### Added
 - parser to execute AST statements

@@ -1,6 +1,8 @@
 package parser
 
-import "awesomeProject/lexer"
+import (
+	"awesomeProject/lexer"
+)
 
 type Program struct {
 
@@ -85,6 +87,16 @@ type Stmt interface {
 	Eval(a *Interpreter)
 }
 
+type WhileStatement struct {
+	Condition Expr
+	Branch Stmt
+}
+
+type IfStatement struct {
+	Condition Expr
+	ThenBranch Stmt
+	ElseBranch Stmt
+}
 type Expression struct {
 	Expression Expr
 }
@@ -112,4 +124,12 @@ func (v Var) Eval(a *Interpreter){
 
 func (b Block) Eval(a *Interpreter){
 	a.VisitBlockStmt(b)
+}
+
+func (i IfStatement) Eval(a *Interpreter){
+	a.VisitIfStmt(i)
+}
+
+func (w WhileStatement) Eval(a *Interpreter){
+	a.VisitWhileStmt(w)
 }

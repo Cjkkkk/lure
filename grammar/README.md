@@ -3,9 +3,11 @@
 program  → statement* EOF;
 
 statement → exprStmt
+          | ifStmt
           | printStmt
           | block ;
 
+ifStmt -> "if" "("expression")" statement "else" statement
 block     → "{" declaration* "}" ;
 expression → assignment ;
 assignment → IDENTIFIER "=" assignment
