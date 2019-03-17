@@ -214,3 +214,6 @@ it emits steps of three-address code. However, it is common for compilers to
 emit the three-address code while the parser "goes through the motions" of
 constructing a syntax tree, without actually constructing the complete tree
 data structure
+
+#### L-Value R-Value
+Right now, the only valid target is a simple variable expression

@@ -18,7 +18,7 @@ type RunTimeError struct {
 }
 func (r *RunTimeError) Error() string{
 	HadRuntimeError = true
-	return r.Msg + "\n[line " + strconv.Itoa(r.Token.Line) + "]"
+	return "[line " + strconv.Itoa(r.Token.Line) + "] near " + r.Token.Lexeme +" : " + r.Msg
 }
 func (p *ParseError) Error() string{
 	return "2333"

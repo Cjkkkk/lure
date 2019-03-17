@@ -12,12 +12,12 @@ import (
 
 
 func run(content string)  {
-	if error.HadError {
-		os.Exit(65)
-	}
-	if error.HadRuntimeError{
-		os.Exit(70)
-	}
+	//if error.HadError {
+	//	os.Exit(65)
+	//}
+	//if error.HadRuntimeError{
+	//	os.Exit(70)
+	//}
 	s := lexer.Scanner{content, []lexer.Token{}, 0 ,0 , 1}
 	s.ScanTokens()
 	p := parser.Parser{s.Tokens , 0}
@@ -27,14 +27,12 @@ func run(content string)  {
 	b.Interpret_(stmts)
 }
 func runFile(filename string) {
-	fmt.Println("running file...")
 	//f, err := os.OpenFile(filename, os.O_RDONLY, os.ModeAppend|os.ModePerm)
 	str, err := ioutil.ReadFile(filename)
 	if err != nil {
 		fmt.Println(err)
 	}
 	run(string(str))
-	fmt.Println("done processing file...")
 }
 
 func runPromot()  {

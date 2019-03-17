@@ -46,8 +46,24 @@ func (p Parser) previous() lexer.Token{
 	return p.Tokens[p.Current - 1]
 }
 
-func (p *Parser)expression() Expr {
-	return p.equality()
+func (p *Parser) expression() Expr {
+	return p.assignment()
+}
+
+func (p *Parser) assignment() Expr {
+	expr := p.equality()
+
+	if p.match(lexer.EQUAL) {
+		equals := p.previous()
+		value := p.assignment()
+		if r, OK := expr.(Variable) ; OK {
+			name := r.name
+			return Assign{name, value}
+		}
+		err.Error(equals, "Invalid assignment target.")
+	}
+
+	return expr
 }
 
 func (p *Parser)equality() Expr {
@@ -138,6 +154,10 @@ func (p *Parser) primary() (Expr, error){
 	return nil, p.error(p.peek(), "Expect expression.")
 }
 
+/*
+	skip designated token
+	if current token != designated token , throw error
+*/
 func (p *Parser) consume (t lexer.TokenType, message string) (lexer.Token, error){
 	if p.check(t) {
 		return p.advance(), nil
@@ -171,9 +191,21 @@ func (p *Parser) synchronize() {
 	p.advance()
 	}
 }
+
+func (p *Parser ) block() []Stmt{
+	var statements []Stmt
+	for !p.check(lexer.RIGHT_BRACE) && !p.isAtEnd() {
+		statements = append(statements, p.declaration())
+	}
+	p.consume(lexer.RIGHT_BRACE, "Expect '}' after block.");
+	return statements
+}
 func (p *Parser) statement() Stmt{
 	if p.match(lexer.PRINT) {
 		return p.printStatement()
+	}
+	if p.match(lexer.LEFT_BRACE){
+		return Block{Statements: p.block()}
 	}
 	return p.expressionStatement()
 }

@@ -1,34 +1,39 @@
 package parser
 
 import (
-	"awesomeProject/Memory"
+	"awesomeProject/memory"
+	"awesomeProject/lexer"
 	"fmt"
+	err "awesomeProject/error"
 )
-import "awesomeProject/lexer"
-
 
 /*
 Interpreter
 */
 
 type Interpreter struct {
-	environment Memory.Environment
+	environment memory.Environment
 }
 func MakeInterpreter() Interpreter{
-	return Interpreter{environment: Memory.Environment{Values:map[string]interface{}{}}}
+	return Interpreter{environment: memory.Environment{ Enclosing: nil,Values:map[string]interface{}{}}}
 }
-func (i *Interpreter) Execute (stmt Stmt) {
-	stmt.Eval(i)
-}
+
 func (i *Interpreter) Interpret_ (statements []Stmt) {
+	defer func() {
+		if e := recover();e != nil {
+			fmt.Println(e)
+		}
+	}()
 	for _, statement :=  range statements {
 		i.Execute(statement)
 	}
-	// catch (RuntimeError error) {
-	//	Lox.runtimeError(error);
-	//}
 }
 //-------------------
+// 执行statements
+func (i *Interpreter) Execute (stmt Stmt) {
+	stmt.Eval(i)
+}
+
 func (i *Interpreter) VisitPrintStmt(stmt Print) {
 	value := i.Evaluate(stmt.Expression)
 	fmt.Println(value)
@@ -42,34 +47,28 @@ func (i *Interpreter) VisitVarStmt(stmt Var){
 	if stmt.Expression != nil {
 		value = i.Evaluate(stmt.Expression)
 	}
-
 	i.environment.Define(stmt.Name.Lexeme, value)
 }
 
+func (i *Interpreter) executeBlock(stmts []Stmt, e *memory.Environment){
+	// todo
+}
+// ---------------------------------------------------
+// 化简expression的值 return interface{}
+
+/* Evaluate expression*/
 func (i *Interpreter) Evaluate(expr Expr) interface{}{
 	return expr.Eval(i)
 }
-func (i *Interpreter) isTruthy(object interface{}) bool{
-	if object == nil {
-		return false
-	}
-	if r, ok := object.(bool); ok {
-		return r
-	}
+
+func (i *Interpreter) VisitBlockStmt(stmt Block){
+	i.executeBlock(stmt.Statements, &memory.Environment{Enclosing: &i.environment, Values: map[string]interface{}{}})
+}
+
+func (i *Interpreter) VisitAssignExpr (expr Assign) interface{}{
+	i.environment.Assign(expr.Name, i.Evaluate(expr.Expr))
 	return true
 }
-
-func (i *Interpreter) isEqual(a interface{}, b interface{}) bool {
-	// nil is only equal to nil.
-	if a == nil && b == nil {
-		return true
-	}
-	if a == nil{
-		return false
-	}
-	return a == b
-}
-
 func (i *Interpreter) VisitLiteralExpr(expr Literal) interface{}{
 	return expr.Value
 }
@@ -78,12 +77,9 @@ func (i *Interpreter) VisitGroupingExpr(expr Grouping) interface{}{
 	return expr.Expression.Eval(i)
 }
 
-// todo
 func (i *Interpreter) VisitBinaryExpr(expr Binary) interface{}{
 	left := expr.Left.Eval(i)
 	right := expr.Right.Eval(i)
-	//r, r_o := strconv.ParseFloat(r_d, 64)
-	//l, l_o := strconv.ParseFloat(l_d, 64)
 	switch expr.Operator.Type {
 	case lexer.MINUS:
 		l_d , r_d := checkNumberOperands(expr.Operator, left, right)
@@ -99,7 +95,8 @@ func (i *Interpreter) VisitBinaryExpr(expr Binary) interface{}{
 		if r_ok && l_ok {
 			return l_s + r_s
 		}
-		//err := error.RunTimeError{ Token: operator , Msg: "Operands must be two numbers or two strings."}
+		e := err.RunTimeError{ Token: expr.Operator , Msg: "Operands must be two numbers or two strings."}
+		panic(e.Error())
 	case lexer.SLASH:
 		l_d , r_d := checkNumberOperands(expr.Operator, left, right)
 		return l_d / r_d
@@ -136,15 +133,17 @@ func (i *Interpreter) VisitUnaryExpr (expr Unary) interface{} {
 	return nil
 }
 
-// todo what to return
 func (i *Interpreter) VisitVariableExpr (expr Variable) interface{}{
 	return i.environment.Get(expr.name)
 }
 
+// ------------------------------------------------------
+// 辅助函数
 func checkNumberOperand(operator lexer.Token, operand interface{}) float64{
 	d, ok := operand.(float64)
 	if ! ok {
-		//err := error.RunTimeError{ Token: operator , Msg: "Operand must be a number."}
+		e := err.RunTimeError{ Token: operator , Msg: "Operand must be a number."}
+		panic(e.Error())
 	}
 	return d
 }
@@ -153,7 +152,29 @@ func checkNumberOperands(operator lexer.Token, left interface{}, right interface
 	ld, l_ok := left.(float64)
 	rd, r_ok := right.(float64)
 	if !l_ok || !r_ok {
-
+		e := err.RunTimeError{ Token: operator , Msg: "Operands must be a number."}
+		panic(e.Error())
 	}
 	return ld, rd
+}
+
+func (i *Interpreter) isTruthy(object interface{}) bool{
+	if object == nil {
+		return false
+	}
+	if r, ok := object.(bool); ok {
+		return r
+	}
+	return true
+}
+
+func (i *Interpreter) isEqual(a interface{}, b interface{}) bool {
+	// nil is only equal to nil.
+	if a == nil && b == nil {
+		return true
+	}
+	if a == nil{
+		return false
+	}
+	return a == b
 }

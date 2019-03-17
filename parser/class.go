@@ -40,6 +40,12 @@ type Unary struct{
 type Variable struct {
 	name lexer.Token
 }
+
+type Assign struct {
+	Name lexer.Token
+	Expr Expr
+}
+
 func (b Binary) Eval(a *Interpreter) interface{}{
 	return a.VisitBinaryExpr(b)
 }
@@ -54,6 +60,10 @@ func (u Unary) Eval(a *Interpreter) interface{}{
 }
 func (v Variable) Eval(a *Interpreter) interface{}{
 	return a.VisitVariableExpr(v)
+}
+
+func (as Assign) Eval(a *Interpreter) interface{}{
+	return a.VisitAssignExpr(as)
 }
 //func (b Binary) Accept(a *AstPrinter) string{
 //	return a.BinaryAccept(b)
@@ -81,6 +91,10 @@ type Expression struct {
 type Print struct {
 	Expression Expr
 }
+
+type Block struct {
+	Statements []Stmt
+}
 type Var struct {
 	Name lexer.Token
 	Expression Expr
@@ -94,4 +108,8 @@ func (p Print) Eval(a *Interpreter){
 
 func (v Var) Eval(a *Interpreter){
 	a.VisitVarStmt(v)
+}
+
+func (b Block) Eval(a *Interpreter){
+	a.VisitBlockStmt(b)
 }
