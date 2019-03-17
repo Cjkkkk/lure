@@ -2,6 +2,7 @@ package memory
 
 import (
 	"awesomeProject/lexer"
+	Err "awesomeProject/error"
 )
 
 type Environment struct{
@@ -15,7 +16,8 @@ func (e *Environment) Assign(name lexer.Token, value interface{}) {
 		e.Values[name.Lexeme] = value
 		return
 	}
-	// err.RunTimeError{name, "Undefined variable '" + name.Lexeme + "'."};
+	err := Err.RunTimeError{Msg:"Undefined variable '" + name.Lexeme + "'.", Token: name}
+	panic(err.Error())
 }
 
 func (e *Environment) Define(name string, value interface{}) {
@@ -30,6 +32,6 @@ func  (e *Environment) Get(name lexer.Token) interface{} {
 	if e.Enclosing != nil {
 		return e.Enclosing.Get(name)
 	}
-	return nil
-	// err.RunTimeError{ Token:name, Msg:"Undefined variable '" + name.Lexeme + "'."}
+	err := Err.RunTimeError{ Token:name, Msg:"Undefined variable '" + name.Lexeme + "'."}
+	panic(err.Error())
 }

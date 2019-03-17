@@ -49,6 +49,9 @@ func (i *Interpreter) VisitVarStmt(stmt Var){
 	}
 	i.environment.Define(stmt.Name.Lexeme, value)
 }
+func (i *Interpreter) VisitBlockStmt(stmt Block){
+	i.executeBlock(stmt.Statements, &memory.Environment{Enclosing: &i.environment, Values: map[string]interface{}{}})
+}
 
 func (i *Interpreter) executeBlock(stmts []Stmt, e *memory.Environment){
 	// todo
@@ -59,10 +62,6 @@ func (i *Interpreter) executeBlock(stmts []Stmt, e *memory.Environment){
 /* Evaluate expression*/
 func (i *Interpreter) Evaluate(expr Expr) interface{}{
 	return expr.Eval(i)
-}
-
-func (i *Interpreter) VisitBlockStmt(stmt Block){
-	i.executeBlock(stmt.Statements, &memory.Environment{Enclosing: &i.environment, Values: map[string]interface{}{}})
 }
 
 func (i *Interpreter) VisitAssignExpr (expr Assign) interface{}{
