@@ -3,7 +3,19 @@ learning compiler and Go
 
 [参考链接](http://www.craftinginterpreters.com/contents.html)
 
-[Go notes](#go)
+## 编译
+根目录下
+
+`go build -o lure.exe`
+
+## 运行
+### REPL
+`lure.exe`
+
+### 执行脚本
+`lure [filename]`
+
+## [Go notes](#go)
 - [types](#types)
 - [variable](#variable)
 - [control flow](#control-flow)
