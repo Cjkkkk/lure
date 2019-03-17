@@ -13,7 +13,7 @@ learning compiler and Go
 `lure.exe`
 
 ### 执行脚本
-`lure [filename]`
+`lure.exe [filename]`
 
 ## [Go notes](#go)
 - [types](#types)
