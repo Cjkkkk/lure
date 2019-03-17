@@ -1,7 +1,12 @@
 # grammar
 ```BNF=
-program  → stmt* EOF;
+program  → statement* EOF;
 
+statement → exprStmt
+          | printStmt
+          | block ;
+
+block     → "{" declaration* "}" ;
 expression → assignment ;
 assignment → IDENTIFIER "=" assignment
            | equality ;

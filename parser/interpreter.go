@@ -12,10 +12,11 @@ Interpreter
 */
 
 type Interpreter struct {
-	environment memory.Environment
+	environment *memory.Environment
 }
 func MakeInterpreter() Interpreter{
-	return Interpreter{environment: memory.Environment{ Enclosing: nil,Values:map[string]interface{}{}}}
+	env := memory.Environment{ Enclosing: nil,Values:map[string]interface{}{}}
+	return Interpreter{environment: &env}
 }
 
 func (i *Interpreter) Interpret_ (statements []Stmt) {
@@ -50,11 +51,16 @@ func (i *Interpreter) VisitVarStmt(stmt Var){
 	i.environment.Define(stmt.Name.Lexeme, value)
 }
 func (i *Interpreter) VisitBlockStmt(stmt Block){
-	i.executeBlock(stmt.Statements, &memory.Environment{Enclosing: &i.environment, Values: map[string]interface{}{}})
+	i.executeBlock(stmt.Statements, &memory.Environment{Enclosing: i.environment, Values: map[string]interface{}{}})
 }
 
-func (i *Interpreter) executeBlock(stmts []Stmt, e *memory.Environment){
-	// todo
+func (i *Interpreter) executeBlock(stmts []Stmt, e *memory.Environment) {
+	previousEnv := i.environment
+	i.environment = e
+	for _, stmt := range stmts {
+		stmt.Eval(i)
+	}
+	i.environment = previousEnv
 }
 // ---------------------------------------------------
 // 化简expression的值 return interface{}
