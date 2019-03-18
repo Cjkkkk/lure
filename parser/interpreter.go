@@ -83,6 +83,19 @@ func (i *Interpreter) Evaluate(expr Expr) interface{}{
 	return expr.Eval(i)
 }
 
+func (i *Interpreter) VisitLogicExpr(expr Logical) interface{}{
+	left := i.Evaluate(expr.Left)
+	if expr.Operator.Type == lexer.OR {
+		if i.isTruthy(left) {
+			return left
+		}
+	} else{
+		if ! i.isTruthy(left) {
+			return left
+		}
+	}
+	return i.Evaluate(expr.Right)
+}
 func (i *Interpreter) VisitAssignExpr (expr Assign) interface{}{
 	i.environment.Assign(expr.Name, i.Evaluate(expr.Expr))
 	return true

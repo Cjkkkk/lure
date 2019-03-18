@@ -34,6 +34,12 @@ type Grouping struct {
 type Literal struct {
 	Value interface{}
 }
+
+type Logical struct{
+	Left Expr
+	Operator lexer.Token
+	Right Expr
+}
 type Unary struct{
 	Operator lexer.Token
 	Right Expr
@@ -66,6 +72,10 @@ func (v Variable) Eval(a *Interpreter) interface{}{
 
 func (as Assign) Eval(a *Interpreter) interface{}{
 	return a.VisitAssignExpr(as)
+}
+
+func (l Logical) Eval(a *Interpreter) interface{}{
+	return a.VisitLogicExpr(l)
 }
 //func (b Binary) Accept(a *AstPrinter) string{
 //	return a.BinaryAccept(b)

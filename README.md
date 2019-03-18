@@ -229,3 +229,10 @@ data structure
 
 #### L-Value R-Value
 Right now, the only valid target is a simple variable expression
+
+#### syntactic sugar
+`for` is actually equivalent with `while`.
+
+one is syntactic sugar for another.
+
+##### consider desugar

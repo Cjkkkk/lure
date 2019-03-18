@@ -49,9 +49,26 @@ func (p Parser) previous() lexer.Token{
 func (p *Parser) expression() Expr {
 	return p.assignment()
 }
-
-func (p *Parser) assignment() Expr {
+func (p *Parser) and() Expr{
 	expr := p.equality()
+	for p.match(lexer.AND) {
+		operator := p.previous()
+		right := p.equality()
+		expr = Logical{Left:expr, Operator:operator, Right:right}
+	}
+	return expr
+}
+func (p *Parser) or() Expr {
+	expr := p.and()
+	for p.match(lexer.OR) {
+		operator := p.previous()
+		and_expr := p.and()
+		expr = Logical{Left:expr, Operator:operator, Right:and_expr}
+	}
+	return expr
+}
+func (p *Parser) assignment() Expr {
+	expr := p.or()
 
 	if p.match(lexer.EQUAL) {
 		equals := p.previous()
