@@ -217,6 +217,41 @@ func (p *Parser ) block() []Stmt{
 	p.consume(lexer.RIGHT_BRACE, "Expect '}' after block.");
 	return statements
 }
+
+func (p *Parser ) forStatemet() Stmt{
+	p.consume(lexer.LEFT_PAREN, "Expect '(' after 'for'.")
+	var initializer Stmt = nil
+	if p.match(lexer.SEMICOLON) {
+		initializer = nil
+	} else if p.match(lexer.VAR) {
+		initializer = p.varDeclaration()
+	} else {
+		initializer = p.expressionStatement()
+	}
+	var condition Expr = nil
+	if !p.check(lexer.SEMICOLON) {
+		condition = p.expression()
+	}
+	p.consume(lexer.SEMICOLON, "Expect ';' after loop condition.")
+	var increment Expr = nil
+	if !p.check(lexer.RIGHT_PAREN) {
+		increment = p.expression()
+	}
+	p.consume(lexer.RIGHT_PAREN, "Expect ')' after for clauses.")
+	body := p.statement()
+	if increment != nil {
+		body = Block{[]Stmt{
+			body, Expression{increment}}}
+	}
+	if condition == nil{
+		condition = Literal{true}
+	}
+	body = WhileStatement{condition, body}
+	if initializer != nil {
+		body = Block{[]Stmt{initializer, body}}
+	}
+	return body
+}
 func (p *Parser) statement() Stmt{
 	if p.match(lexer.PRINT) {
 		return p.printStatement()
@@ -229,6 +264,9 @@ func (p *Parser) statement() Stmt{
 	}
 	if p.match(lexer.LEFT_BRACE){
 		return Block{Statements: p.block()}
+	}
+	if p.match(lexer.FOR) {
+		return p.forStatemet()
 	}
 	return p.expressionStatement()
 }

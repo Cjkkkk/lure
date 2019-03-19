@@ -20,3 +20,7 @@ print a + b;
 print true and false;
 print false or "hi";
 print "hello world";
+
+for(var i = 0 ; i < 3 ; i = i + 1){
+    print i;
+}
