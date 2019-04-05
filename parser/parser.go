@@ -139,12 +139,33 @@ func (p *Parser) unary() Expr{
 		right := p.unary()
 		return Unary{Operator:operator, Right:right}
 	}
-	if r, e := p.primary(); e != nil {
-		// todo
-		return nil
-	} else{
-		return r
+	return p.call()
+}
+
+func (p *Parser) call() (Expr){
+	expr, e := p.primary()
+	if e != nil {
+		panic(e.Error())
 	}
+	var args []Expr
+	for p.match(lexer.LEFT_PAREN) {
+		for !p.check(lexer.RIGHT_PAREN) {
+			temp := p.expression()
+			args = append(args, temp)
+			if len(args) > 8 {
+				panic("Can not have more than 8 arguments.")
+			}
+			if !p.match(lexer.COMMA) {
+				paren, e := p.consume(lexer.RIGHT_PAREN, "Expect ')' after function call.")
+				if e != nil {
+					panic(e.Error())
+				}
+				expr = Call{Paren:paren, Args:args, Callee:expr}
+				break
+			}
+		}
+	}
+	return expr
 }
 
 func (p *Parser) primary() (Expr, error){

@@ -53,7 +53,11 @@ type Assign struct {
 	Name lexer.Token
 	Expr Expr
 }
-
+type Call struct {
+	Paren lexer.Token
+	Callee Expr
+	Args []Expr
+}
 func (b Binary) Eval(a *Interpreter) interface{}{
 	return a.VisitBinaryExpr(b)
 }
@@ -76,6 +80,10 @@ func (as Assign) Eval(a *Interpreter) interface{}{
 
 func (l Logical) Eval(a *Interpreter) interface{}{
 	return a.VisitLogicExpr(l)
+}
+
+func (c Call) Eval(a *Interpreter) interface{}{
+	return a.VisitCallExpr(c)
 }
 //func (b Binary) Accept(a *AstPrinter) string{
 //	return a.BinaryAccept(b)

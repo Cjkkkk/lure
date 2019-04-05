@@ -83,6 +83,15 @@ func (i *Interpreter) Evaluate(expr Expr) interface{}{
 	return expr.Eval(i)
 }
 
+func (i *Interpreter) VisitCallExpr(expr Call) interface{} {
+	//callee := expr.Callee.Eval(i)
+	//var evaluatedArgs []interface{}
+	//for _, arg := range expr.Args {
+	//	temp := arg.Eval(i)
+	//	evaluatedArgs = append(evaluatedArgs, temp)
+	//}
+
+}
 func (i *Interpreter) VisitLogicExpr(expr Logical) interface{}{
 	left := i.Evaluate(expr.Left)
 	if expr.Operator.Type == lexer.OR {
