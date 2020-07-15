@@ -1,6 +1,6 @@
 # grammar
 ```BNF=
-program  → statement* EOF;
+program  → declaration* EOF;
 
 declaration → varDecl
             | statement ;
